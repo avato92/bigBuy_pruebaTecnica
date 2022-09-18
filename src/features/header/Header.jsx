@@ -1,4 +1,4 @@
-import Logo from '../../img/bigBuyLogo';
+import Logo from '../../assets/bigBuyLogo';
 import './header.css';
 
 function Header() {

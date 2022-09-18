@@ -1,13 +1,13 @@
 import './App.css';
 
 import Header from './features/header/Header';
-import WorkerList from './features/workerList/WorkerList';
+import WorkerComponent from './features/workerComponent/WorkerComponent';
 
 function App() {
   return (
     <>
       <Header />
-      <WorkerList />
+      <WorkerComponent />
     </>
   );
 }
