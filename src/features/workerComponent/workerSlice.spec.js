@@ -38,6 +38,6 @@ describe('workers reducer', () => {
     };
     const workersSaved = workerReducer(initialState, saveWorkers(newWorkers));
     const actual = workerReducer(workersSaved, updateWorker(workerUpdated));
-    expect(actual.workers[2]).toEqual(workerUpdated);
+    expect(actual.workers[1]).toEqual(workerUpdated);
   });
 });

@@ -15,7 +15,7 @@ function WorkerComponent() {
     <main className="workers__container">
       {loading && <Loading />}
       {error && <Error />}
-      {workers && <WorkerTable workers />}
+      {workers && <WorkerTable workers={workers} />}
     </main>
   );
 }
