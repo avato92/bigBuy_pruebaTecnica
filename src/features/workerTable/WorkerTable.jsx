@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable no-restricted-globals */
 import { useState, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -9,8 +9,11 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
+import Input from '@mui/material/Input';
+import InputAdornment from '@mui/material/InputAdornment';
 import PropTypes from 'prop-types';
 
 const TABLE_COLUMNS_CONF = [
@@ -29,8 +32,11 @@ const TABLE_COLUMNS_CONF = [
 ];
 
 function WorkerTable(props) {
+  const [salaryRange, setSalaryRange] = useState([0, 5000]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [inputFilter, setInputFilter] = useState();
+  const [rows, setRows] = useState([]);
   const { workers } = props;
 
   const handleChangePage = (event, newPage) => {
@@ -60,23 +66,100 @@ function WorkerTable(props) {
     </ButtonGroup>
   );
 
-  function createData(workersToParse) {
-    return workersToParse.map((worker) => {
-      const {
-        name, age, salary, id,
-      } = worker;
-      const actions = buttonsElement();
+  function parserData(worker) {
+    const {
+      name, age, id,
+    } = worker;
 
-      return {
-        name, age, salary, id, actions,
-      };
-    });
+    /**
+     * Transforma los salarios base a salarios expresados en miles
+     * Ej: 5400€ -> 5.4K
+     */
+    const salary = `${Math.round((worker.salary / 1000) * 10) / 10}K`;
+    const actions = buttonsElement();
+
+    return {
+      name, age, salary, id, actions,
+    };
   }
 
-  const rows = createData(workers);
+  function createData(workersToParse) {
+    if (inputFilter && isNaN(inputFilter)) {
+      return workersToParse.filter((worker) => worker.name.includes(inputFilter) || worker.email.includes(inputFilter)).map((worker) => parserData(worker));
+    } if (inputFilter && !isNaN(inputFilter)) {
+      return workersToParse.filter((worker) => worker.age === Number(inputFilter)).map((worker) => parserData(worker));
+    }
+    return workersToParse.map((worker) => parserData(worker));
+  }
+
+  function filterDataBySalary(workersToParse) {
+    return workersToParse.filter((worker) => worker.salary > salaryRange[0] && worker.salary < salaryRange[1]);
+  }
+
+  useEffect(() => {
+    setRows(createData(workers));
+  }, []);
+
+  const handleClick = () => {
+    const rowsCreated = createData(workers);
+    setRows(rowsCreated);
+  };
+
+  const handleChangeInput = (event) => {
+    setInputFilter(event.target.value);
+  };
+
+  const handleChange = (event, newValue) => {
+    setSalaryRange(newValue);
+    setRows(filterDataBySalary(workers));
+  };
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 1,
+          m: 1,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+        }}
+      >
+        <Box
+          variant="standard"
+          sx={{
+            width: 300, display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+          }}
+        >
+          <Input
+            sx={{ maxWidth: 150 }}
+            placeholder="Search..."
+            id="inputFilter"
+            onChange={handleChangeInput}
+            startAdornment={(
+              <InputAdornment position="start">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path opacity="0.3" d="M7.10988 2.73457C8.12213 2.73457 9.10306 3.08556 9.88554 3.72773C10.668 4.3699 11.2036 5.26352 11.4011 6.25632C11.5986 7.24912 11.4457 8.27968 10.9685 9.1724C10.4914 10.0651 9.7194 10.7648 8.7842 11.1521C7.849 11.5395 6.80842 11.5906 5.83975 11.2968C4.87109 11.0029 4.03428 10.3823 3.47191 9.54066C2.90954 8.699 2.65639 7.68838 2.75562 6.68101C2.85484 5.67363 3.30028 4.73182 4.01606 4.01606C4.42138 3.60848 4.90353 3.28535 5.43459 3.06538C5.96565 2.84541 6.53507 2.73297 7.10988 2.73457ZM7.10988 0C3.18304 0 0 3.18304 0 7.10988C0 11.0367 3.18304 14.2198 7.10988 14.2198C11.0367 14.2198 14.2198 11.0367 14.2198 7.10988C14.2198 3.18304 11.0367 0 7.10988 0Z" fill="#0090FF" />
+                  <path d="M17.2587 16.2945L16.2914 17.2619C16.2154 17.3383 16.1252 17.3989 16.0257 17.4402C15.9263 17.4816 15.8197 17.5029 15.712 17.5029C15.6043 17.5029 15.4977 17.4816 15.3982 17.4402C15.2988 17.3989 15.2085 17.3383 15.1326 17.2619L11.7246 13.8539C11.6485 13.7776 11.5882 13.6869 11.5471 13.5872C11.5061 13.4875 11.4851 13.3807 11.4854 13.2728V12.7157L12.7159 11.4851H13.2731C13.3809 11.4848 13.4877 11.5058 13.5874 11.5469C13.6872 11.588 13.7778 11.6483 13.8542 11.7244L17.2621 15.1323C17.4152 15.2872 17.5008 15.4964 17.5002 15.7141C17.4995 15.9319 17.4127 16.1406 17.2587 16.2945Z" fill="#0090FF" />
+                </svg>
+              </InputAdornment>
+          )}
+          />
+          <Button onClick={handleClick} variant="contained">Filtrar</Button>
+        </Box>
+        <Slider
+          sx={{ width: 300 }}
+          getAriaLabel={() => 'Filtro de rango salarial'}
+          value={salaryRange}
+          onChange={handleChange}
+          valueLabelDisplay="auto"
+          max={5000}
+          scale={(x) => `${x * 0.001}K`}
+        />
+      </Box>
       <TableContainer sx={{ maxHeight: '100%' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
