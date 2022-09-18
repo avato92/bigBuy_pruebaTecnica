@@ -20,6 +20,8 @@ import {
   TABLE_COLUMNS_CONF, INITIAL_PAGE, MAXIMUM_SALARY, MINIMUM_SALARY,
 } from './tableConfig';
 import SearchIcon from '../../assets/searchIcon';
+import AddUserIcon from '../../assets/AddUserIcon';
+import DetailsModal from '../../components/detailsModal/DetailsModal';
 
 function WorkerTable(props) {
   const [salaryRange, setSalaryRange] = useState([MINIMUM_SALARY, MAXIMUM_SALARY]);
@@ -27,6 +29,9 @@ function WorkerTable(props) {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [inputFilter, setInputFilter] = useState();
   const [rows, setRows] = useState([]);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const { workers } = props;
 
   const handleChangePage = (event, newPage) => {
@@ -134,6 +139,11 @@ function WorkerTable(props) {
           max={5000}
           scale={(x) => `${x * 0.001}K`}
         />
+        <Button variant="contained" onClick={handleOpen} sx={{ backgroundColor: '#FFCE33' }}>
+          <AddUserIcon />
+          Nuevo empleado
+        </Button>
+        <DetailsModal open={open} handleClose={handleClose} type="create" />
       </Box>
       <TableContainer sx={{ maxHeight: '100%' }}>
         <Table stickyHeader aria-label="sticky table">

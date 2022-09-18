@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import PropTypes from 'prop-types';
@@ -9,22 +9,26 @@ import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 
-import { updateWorker } from '../../features/workerComponent/workerSlice';
+import { updateWorker, createWorker } from '../../features/workerComponent/workerSlice';
 import { styleBoxContainer, styleBoxInput } from './constants';
 
 function DetailsModal(props) {
-  const { worker, open, handleClose } = props;
+  const [error, setError] = useState(false);
+  const {
+    worker, open, handleClose, type,
+  } = props;
+
   const dispatchRedux = useDispatch();
   const {
     id, name, email, salary, age,
   } = worker;
 
   const initialState = {
-    id,
-    name,
-    email,
-    age,
-    salary,
+    id: id || null,
+    name: name || '',
+    email: email || '',
+    age: age || 0,
+    salary: salary || 0,
   };
 
   function reducer(state, action) {
@@ -41,13 +45,24 @@ function DetailsModal(props) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleInput = (ev, type) => {
-    dispatch({ type, payload: ev.target.value });
+  const validationForm = () => state.name && state.age && state.salary && state.email;
+
+  const handleInput = (ev, typeInput) => {
+    dispatch({ type: typeInput, payload: ev.target.value });
   };
 
   const handleClick = () => {
-    dispatchRedux(updateWorker(state));
-    handleClose();
+    if (type === 'update' && validationForm()) {
+      dispatchRedux(updateWorker(state));
+      setError(false);
+      handleClose();
+    } else if (type === 'create' && validationForm()) {
+      dispatchRedux(createWorker({ ...state, id: Math.random() }));
+      setError(false);
+      handleClose();
+    } else {
+      setError(true);
+    }
   };
 
   return (
@@ -58,6 +73,7 @@ function DetailsModal(props) {
       aria-describedby="Modal donde se puede apreciar los detalles del trabajador"
     >
       <Box sx={styleBoxContainer}>
+        {error && <p>Hay errores en el formulario, revisalo</p>}
         <Box sx={styleBoxInput}>
           <InputLabel htmlFor="inputName">
             Nombre
@@ -114,14 +130,25 @@ function DetailsModal(props) {
 
 DetailsModal.propTypes = {
   worker: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    age: PropTypes.number.isRequired,
+    id: PropTypes.number,
+    name: PropTypes.string,
+    email: PropTypes.string,
+    age: PropTypes.number,
     salary: PropTypes.number,
-  }).isRequired,
+  }),
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
+};
+
+DetailsModal.defaultProps = {
+  worker: {
+    id: null,
+    email: '',
+    name: '',
+    salary: 0,
+    age: 0,
+  },
 };
 
 export default DetailsModal;

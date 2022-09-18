@@ -29,7 +29,7 @@ function ButtonsElement(props) {
       <Button key="delete" onClick={() => dispatch(deleteWorker(id))}>
         <CroosIcon />
       </Button>
-      <DetailsModal open={open} worker={worker} handleClose={handleClose} />
+      <DetailsModal open={open} worker={worker} handleClose={handleClose} type="update" />
     </ButtonGroup>
   );
 }

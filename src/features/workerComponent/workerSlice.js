@@ -17,7 +17,12 @@ export const workerSlice = createSlice({
       state.workers = remainingWorkers;
     },
     createWorker: (state, action) => {
-      state.workers.push(action.payload);
+      const {
+        id, name, email, salary, age,
+      } = action.payload;
+      state.workers.push({
+        id: Number(id), name, email, salary: Number(salary), age: Number(age),
+      });
     },
     updateWorker: (state, action) => {
       const workersUpdated = state.workers.map((worker) => {
