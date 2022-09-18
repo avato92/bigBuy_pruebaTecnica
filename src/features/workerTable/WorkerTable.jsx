@@ -15,7 +15,7 @@ import Input from '@mui/material/Input';
 import InputAdornment from '@mui/material/InputAdornment';
 import PropTypes from 'prop-types';
 
-import ButtonsElement from '../../components/ButtonsElement';
+import ButtonsElement from '../../components/buttonsElement/ButtonsElement';
 import {
   TABLE_COLUMNS_CONF, INITIAL_PAGE, MAXIMUM_SALARY, MINIMUM_SALARY,
 } from './tableConfig';

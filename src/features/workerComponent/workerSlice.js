@@ -23,6 +23,7 @@ export const workerSlice = createSlice({
       const workersUpdated = state.workers.map((worker) => {
         if (worker.id === action.payload.id) {
           worker = action.payload;
+          worker.age = Number(action.payload.age);
         }
         return worker;
       });
