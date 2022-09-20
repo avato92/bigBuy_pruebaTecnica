@@ -10,12 +10,12 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 
 import { updateWorker, createWorker } from '../../features/workerComponent/workerSlice';
-import { styleBoxContainer, styleBoxInput } from './constants';
+import { styleBoxContainer, styleBoxInput } from './config';
 
 function DetailsModal(props) {
   const [error, setError] = useState(false);
   const {
-    worker, open, handleClose, type,
+    worker, open, handleClose, type, config,
   } = props;
 
   const dispatchRedux = useDispatch();
@@ -45,7 +45,7 @@ function DetailsModal(props) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const validationForm = () => state.name && state.age && state.salary && state.email;
+  const validationForm = () => state.name && state.age && state.email;
 
   const handleInput = (ev, typeInput) => {
     dispatch({ type: typeInput, payload: ev.target.value });
@@ -74,52 +74,21 @@ function DetailsModal(props) {
     >
       <Box sx={styleBoxContainer}>
         {error && <p>Hay errores en el formulario, revisalo</p>}
-        <Box sx={styleBoxInput}>
-          <InputLabel htmlFor="inputName">
-            Nombre
-          </InputLabel>
-          <Input
-            sx={{ maxWidth: 300 }}
-            id="inputName"
-            onChange={(ev) => handleInput(ev, 'name')}
-            value={state.name}
-          />
-        </Box>
-        <Box sx={styleBoxInput}>
-          <InputLabel htmlFor="inputEmail">
-            Email
-          </InputLabel>
-          <Input
-            sx={{ maxWidth: 300 }}
-            id="inputEmail"
-            onChange={(ev) => handleInput(ev, 'email')}
-            value={state.email}
-          />
-        </Box>
-        <Box sx={styleBoxInput}>
-          <InputLabel htmlFor="inputAge">
-            Edad
-          </InputLabel>
-          <Input
-            sx={{ maxWidth: 300 }}
-            id="inputAge"
-            onChange={(ev) => handleInput(ev, 'age')}
-            value={state.age}
-            type="number"
-          />
-        </Box>
-        <Box sx={styleBoxInput}>
-          <InputLabel htmlFor="inputSalary">
-            Salario
-          </InputLabel>
-          <Input
-            sx={{ maxWidth: 300 }}
-            id="inputSalary"
-            onChange={(ev) => handleInput(ev, 'salary')}
-            value={state.salary}
-            type="number"
-          />
-        </Box>
+
+        {config.map((input) => (
+          <Box sx={styleBoxInput} key={input.childId}>
+            <InputLabel htmlFor={input.id}>
+              {input.label}
+            </InputLabel>
+            <Input
+              sx={{ maxWidth: 300 }}
+              id={input.id}
+              onChange={(ev) => handleInput(ev, input.valueName)}
+              value={state[input.valueName]}
+              type={input.type}
+            />
+          </Box>
+        ))}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button sx={{ maxWidth: 100 }} variant="contained" onClick={handleClick}>Guardar</Button>
         </Box>
@@ -139,6 +108,13 @@ DetailsModal.propTypes = {
   open: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
+  config: PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    valueName: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    childId: PropTypes.number.isRequired,
+  })).isRequired,
 };
 
 DetailsModal.defaultProps = {

@@ -9,6 +9,7 @@ import CroosIcon from '../../assets/CrossIcon';
 import EyeIcon from '../../assets/EyeIcon';
 import { deleteWorker } from '../../features/workerComponent/workerSlice';
 import DetailsModal from '../detailsModal/DetailsModal';
+import CONFIG_FORM from './config';
 
 function ButtonsElement(props) {
   const { worker } = props;
@@ -29,7 +30,7 @@ function ButtonsElement(props) {
       <Button key="delete" onClick={() => dispatch(deleteWorker(id))}>
         <CroosIcon />
       </Button>
-      <DetailsModal open={open} worker={worker} handleClose={handleClose} type="update" />
+      <DetailsModal config={CONFIG_FORM} open={open} worker={worker} handleClose={handleClose} type="update" />
     </ButtonGroup>
   );
 }

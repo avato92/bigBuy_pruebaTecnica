@@ -6,42 +6,25 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
-import Input from '@mui/material/Input';
-import InputAdornment from '@mui/material/InputAdornment';
+
 import PropTypes from 'prop-types';
 
 import ButtonsElement from '../../components/buttonsElement/ButtonsElement';
+import PaginationComponent from '../../components/pagination/Pagination';
 import {
-  TABLE_COLUMNS_CONF, INITIAL_PAGE, MAXIMUM_SALARY, MINIMUM_SALARY,
+  TABLE_COLUMNS_CONF, MAXIMUM_SALARY, MINIMUM_SALARY,
 } from './tableConfig';
-import SearchIcon from '../../assets/searchIcon';
-import AddUserIcon from '../../assets/AddUserIcon';
-import DetailsModal from '../../components/detailsModal/DetailsModal';
+import FilterElements from '../../components/filterElements/FilterElements';
 
 function WorkerTable(props) {
-  const [salaryRange, setSalaryRange] = useState([MINIMUM_SALARY, MAXIMUM_SALARY]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [inputFilter, setInputFilter] = useState();
+  const [salaryRange, setSalaryRange] = useState([MINIMUM_SALARY, MAXIMUM_SALARY]);
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [inputFilter, setInputFilter] = useState(0);
+
   const { workers } = props;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(INITIAL_PAGE);
-  };
 
   function parserData(worker) {
     const {
@@ -52,7 +35,7 @@ function WorkerTable(props) {
      * Transforma los salarios base a salarios expresados en miles
      * Ej: 5400€ -> 5.4K
      */
-    const salary = `${Math.round((worker.salary / 1000) * 10) / 10}K`;
+    const salary = `${Math.round((worker.salary / 100)) / 10}K`;
     const actions = <ButtonsElement worker={worker} />;
 
     return {
@@ -99,52 +82,12 @@ function WorkerTable(props) {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          p: 1,
-          m: 1,
-          bgcolor: 'background.paper',
-          borderRadius: 1,
-        }}
-      >
-        <Box
-          variant="standard"
-          sx={{
-            width: 300, display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-          }}
-        >
-          <Input
-            sx={{ maxWidth: 150 }}
-            placeholder="Search..."
-            id="inputFilter"
-            onChange={handleChangeInput}
-            startAdornment={(
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-          )}
-          />
-          <Button onClick={handleClick} variant="contained">Filtrar</Button>
-        </Box>
-        <Slider
-          sx={{ width: 300 }}
-          getAriaLabel={() => 'Filtro de rango salarial'}
-          value={salaryRange}
-          onChange={handleChange}
-          valueLabelDisplay="auto"
-          max={5000}
-          scale={(x) => `${x * 0.001}K`}
-        />
-        <Button variant="contained" onClick={handleOpen} sx={{ backgroundColor: '#FFCE33' }}>
-          <AddUserIcon />
-          Nuevo empleado
-        </Button>
-        <DetailsModal open={open} handleClose={handleClose} type="create" />
-      </Box>
+      <FilterElements
+        handleChange={handleChange}
+        handleChangeInput={handleChangeInput}
+        handleClick={handleClick}
+        salaryRange={salaryRange}
+      />
       <TableContainer sx={{ maxHeight: '100%' }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -178,14 +121,12 @@ function WorkerTable(props) {
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={rows.length}
+      <PaginationComponent
+        setPage={setPage}
+        setRowsPerPage={setRowsPerPage}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+        count={Math.ceil(rows.length / rowsPerPage)}
       />
     </Paper>
   );

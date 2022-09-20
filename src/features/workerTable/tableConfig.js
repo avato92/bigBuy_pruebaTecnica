@@ -13,8 +13,6 @@ export const TABLE_COLUMNS_CONF = [
   },
 ];
 
-export const INITIAL_PAGE = 0;
-
 export const MAXIMUM_SALARY = 5000;
 
 export const MINIMUM_SALARY = 0;
